@@ -8,9 +8,37 @@ const GetPrices = () => {
   const [tempArr, setTempArr] = useState([]);
   const [tempArr2, setTempArr2] = useState([]);
   const [loaded, setLoaded] = useState(false);
+  const [nameArr, setNameArr] = useState([]);
+
   let counter = 1;
 
+  const runAllTheTime = () => {
+    setInterval(() => {
+      axios
+      .get(
+        'https://min-api.cryptocompare.com/data/pricemultifull?fsyms=BTC,ETH,USDT,XRP,BCH,BSV,LTC,BNB,EOS,ADA&tsyms=USD&api_key={362a965976ce99a80e7e7955dbb0353c2d9db8df0ecd2817c32052ea3453b07f}'
+      )
+      .then((res) => {
+        const cryptos = res.data;
+        const tempCoins = cryptos['DISPLAY'];
+        setCoins(tempCoins);
+        setLoaded(true);
+        colourChange();
+      });
+    
+
+     
+
+
+      console.log('you can see me every 10 seconds')
+  }, 10000);
+    
+     
+  
+  }
+  
   useEffect(() => {
+    
     axios
       .get(
         'https://min-api.cryptocompare.com/data/pricemultifull?fsyms=BTC,ETH,USDT,XRP,BCH,BSV,LTC,BNB,EOS,ADA&tsyms=USD&api_key={362a965976ce99a80e7e7955dbb0353c2d9db8df0ecd2817c32052ea3453b07f}'
@@ -20,49 +48,97 @@ const GetPrices = () => {
         const tempCoins = cryptos['DISPLAY'];
         setCoins(tempCoins);
         setLoaded(true);
+        storeDetails();
+        runAllTheTime();
+        colourChange();
+        
       });
 
-    if (loaded) colourChange();
   }, [loaded]);
 
-  const colourChange = () => {
-    Object.keys(coins).map((key) => {
+  function storeDetails(){
+    var names = [];
+    var prices = [];
+    var oneHourChange = [];
+    var twentyfourHourChange = [];
+    var marketCap = [];
+
+    Object.keys(coins).map((key,id) => {
+    
+      
+      names.push(key);
+      prices.push(coins[key].USD.PRICE);
+      oneHourChange.push(coins[key].USD.CHANGEPCTHOUR)
+      twentyfourHourChange.push(coins[key].USD.CHANGEPCT24HOUR)
+      marketCap.push(coins[key].USD.MKTCAP)
+
+    });
+    console.log(names);
+    console.log(prices);
+    console.log(oneHourChange);
+    console.log(twentyfourHourChange);
+    console.log(marketCap);
+  }
+
+ 
+
+  function colourChange () {
+   
+     
+    Object.keys(coins).map((key,id) => {
+      
       var check = Math.sign(coins[key].USD.CHANGEPCTHOUR);
       var check2 = Math.sign(coins[key].USD.CHANGEPCT24HOUR);
-
+      
+      
       if (check === -1) {
         const color = '#ff0000';
         setTempArr((tempArr) => [...tempArr, color]);
-      } else {
-        const color = '#00cc00';
+      } else if(check === 0) {
+        const color = '#FFFFFF';
+        setTempArr((tempArr) => [...tempArr, color]);
+      } else{
+        const color = '#80ff00';
         setTempArr((tempArr) => [...tempArr, color]);
       }
 
       if (check2 === -1) {
         const color = '#ff0000';
         setTempArr2((tempArr2) => [...tempArr2, color]);
-      } else {
-        const color = '#00cc00';
+      } else if(check2===0) {
+        const color = '#FFFFFF';
+        setTempArr2((tempArr2) => [...tempArr2, color]);
+      }else{
+        const color = '#80ff00';
         setTempArr2((tempArr2) => [...tempArr2, color]);
       }
+
+
     });
+
+    console.log('color change called')
+    
+   
   };
 
+
+
   return (
+    
     <div className='fullTable'>
       <table className='table table-dark'>
         <thead>
           <tr id='tableHead'>
-            <th scope='col'>Rank</th>
-            <th scope='col'>Name</th>
+            <th  scope='col'>Rank</th>
+            <th  scope='col'>Name</th>
             <th scope='col'>Price(USD)</th>
             <th scope='col'>1Hr Change</th>
-            <th scope='col'>24Hr Change</th>
-            <th scope='col'>24Hr Volume</th>
+            <th  scope='col'>24Hr Change</th>
+            <th  scope='col'>24Hr Volume</th>
             <th scope='col'>Market Cap</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className='tbody'>
           {Object.keys(coins).map((key, index) => (
             <tr className='roar'>
               <td id='rank' scope='row'>
