@@ -4,12 +4,13 @@ import NumberFormat from 'react-number-format';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const GetPrices = () => {
+
   const [coins, setCoins] = useState([]);
   const [priceArr, setPriceArr] = useState([]);
   const [tempArr, setTempArr] = useState([]);
   const [tempArr2, setTempArr2] = useState([]);
-  const [loaded, setLoaded] = useState(false);
-  const [tester, setTester] = useState(0);
+  // const [loaded, setLoaded] = useState(false);
+   const [tester, setTester] = useState(0);
   
   function storeDetails(){
 
@@ -22,76 +23,33 @@ const GetPrices = () => {
     Object.keys(coins).map((key,id) => {
     
      
-      names.push(key);
+    //  names.push(key);
       
-      oneHourChange.push(coins[key].USD.CHANGEPCTHOUR);
-      twentyfourHourChange.push(coins[key].USD.CHANGEPCT24HOUR);
-      marketCap.push(coins[key].USD.MKTCAP);
-
-     
-    setPriceArr(priceArr => [...priceArr, coins[key].USD.PRICE]);
-
-    console.log(coins[key].USD.PRICE)
-      
-      
+     // oneHourChange.push(coins[key].USD.CHANGEPCTHOUR);
+     // twentyfourHourChange.push(coins[key].USD.CHANGEPCT24HOUR);
+    //  marketCap.push(coins[key].USD.MKTCAP);
+     setPriceArr(priceArr => [...priceArr, coins[key].USD.PRICE]);
+     setPriceArr(coins[key].USD.PRICE);
+     console.log(priceArr[id])
     });
-    console.log(coins)
-    // console.log(names);
-    
-      console.log("storeDetails ran")
-    // console.log(oneHourChange);
-    // console.log(twentyfourHourChange);
-    // console.log(marketCap);
 
+      console.log("priceArray" + priceArr[0]) // in the log this value stays static 
+    console.log(coins)
+   
     
-    
+      console.log("inside storeDetails")
+   
   }
+
+  
   
 
   let counter = 1;
 
-  function runAllTheTime () {
-    
-      axios
-      .get(
-        'https://min-api.cryptocompare.com/data/pricemultifull?fsyms=BTC,ETH,USDT,XRP,BCH,BSV,LTC,BNB,EOS,ADA&tsyms=USD&api_key={362a965976ce99a80e7e7955dbb0353c2d9db8df0ecd2817c32052ea3453b07f}'
-      )
-      .then((res) => {
-        let cryptos = res.data;
-        let tempCoins = cryptos['DISPLAY'];
-        
-        setCoins(tempCoins);
-        
-        
-       // colourChange();
-        console.log("latest BTC price " + tempCoins['BTC'].USD.PRICE)      // in the log this value updates
-        setTester(tempCoins['BTC'].USD.PRICE);
-        
-    Object.keys(coins).map((key,id) => {
-    
-     
-      console.log(coins[key].USD.PRICE) // in the log this value stays static 
-      
-      
-    });
-       
-       
-      });
-    
-
-     
-
-      
-      
- 
-    
-     
-  
-  }
 
   const test = () => {
     setTimeout(() => {
-      setTester(tester =>tester+1)
+      setTester(tester => tester+1)
       console.log(tester)
     //  runAllTheTime();
      // storeDetails();
@@ -101,33 +59,45 @@ const GetPrices = () => {
   
   useEffect(() => {
     
+    //  storeDetails();
     axios
       .get(
         'https://min-api.cryptocompare.com/data/pricemultifull?fsyms=BTC,ETH,USDT,XRP,BCH,BSV,LTC,BNB,EOS,ADA&tsyms=USD&api_key={362a965976ce99a80e7e7955dbb0353c2d9db8df0ecd2817c32052ea3453b07f}'
       )
       .then((res) => {
-        const cryptos = res.data;
-        const tempCoins = cryptos['DISPLAY'];
+        let cryptos = res.data;
+        let tempCoins = cryptos['DISPLAY'];
         setCoins(tempCoins);
-        setLoaded(false);
-       // storeDetails();
         
-        test();
+        //setLoaded(false);
+      // storeDetails();
        // colourChange();
-        console.log("inside use effect runs only once")
-        console.log("latest BTC price " + tempCoins['BTC'].USD.PRICE)  
-
-        
-            
-    Object.keys(coins).map((key,id) => {
+        test();
+       console.log(coins);
+        console.log("inside useEffect")
+        console.log("latest BTC price " + tempCoins['BTC'].USD.PRICE)
+        setPriceArr([])
+        Object.keys(tempCoins).map((key,id) => {
     
+          
      
-      console.log(coins[key].USD.PRICE) // in the log this value stays static 
-      
-      
-    });
+          //  names.push(key);
+            
+           // oneHourChange.push(coins[key].USD.CHANGEPCTHOUR);
+           // twentyfourHourChange.push(coins[key].USD.CHANGEPCT24HOUR);
+          //  marketCap.push(coins[key].USD.MKTCAP);
+          
+          setPriceArr(priceArr => [...priceArr, tempCoins[key].USD.PRICE]);
+  //         setPriceArr(tempCoins[key].USD.PRICE);
+           console.log(priceArr[id])
+          });
 
+         
+       
       });
+      
+      
+      
 
   }, [tester]);
 
@@ -206,7 +176,7 @@ const GetPrices = () => {
               {
                 <td id='price'>
                   <NumberFormat
-                    value={coins[key].USD.PRICE}
+                    value={priceArr[index]}
                     
                     displayType={'text'}
                     decimalPrecision={2}
