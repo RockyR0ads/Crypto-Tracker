@@ -49,11 +49,14 @@ th:hover{
 }
 
 td{
-  padding: 1rem;
+  
 }
 
 .roar{
-  padding: 5rem;
+ 
+}
+.rank{
+  padding: 0px;
 }
 
 .fullTable{
@@ -96,4 +99,13 @@ td{
 .liveTicker{
  
  margin-left: 400px;
+}
+.image{
+  height: 30px;
+  width: 30px;
+  margin-right: 20px;
+}
+.imageColumn{
+  padding: 0px;
+  ;
 }

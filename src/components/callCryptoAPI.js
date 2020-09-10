@@ -6,112 +6,92 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const GetPrices = () => {
 
   const [coins, setCoins] = useState([]);
+  const [oneHRChange, setoneHRChange] = useState([]);
+  const [twentyFourHRChange, settwentyFourHRChange] = useState([]);
   const [priceArr, setPriceArr] = useState([]);
+  
   const [tempArr, setTempArr] = useState([]);
   const [tempArr2, setTempArr2] = useState([]);
-  // const [loaded, setLoaded] = useState(false);
-   const [tester, setTester] = useState(0);
+  const [loaded, setLoaded] = useState(true);
+  const [tester, setTester] = useState(0);
   
-  function storeDetails(){
-
-    var names = [];
-    var prices = [];
-    var oneHourChange = [];
-    var twentyfourHourChange = [];
-    var marketCap = [];
-
-    Object.keys(coins).map((key,id) => {
-    
-     
-    //  names.push(key);
-      
-     // oneHourChange.push(coins[key].USD.CHANGEPCTHOUR);
-     // twentyfourHourChange.push(coins[key].USD.CHANGEPCT24HOUR);
-    //  marketCap.push(coins[key].USD.MKTCAP);
-     setPriceArr(priceArr => [...priceArr, coins[key].USD.PRICE]);
-     setPriceArr(coins[key].USD.PRICE);
-     console.log(priceArr[id])
-    });
-
-      console.log("priceArray" + priceArr[0]) // in the log this value stays static 
-    console.log(coins)
-   
-    
-      console.log("inside storeDetails")
-   
-  }
-
-  
-  
-
   let counter = 1;
-
+ 
 
   const test = () => {
+    
     setTimeout(() => {
-      setTester(tester => tester+1)
-      console.log(tester)
-    //  runAllTheTime();
-     // storeDetails();
-     
+    setTester(tester => tester+1)
+    console.log(tester)
+ 
     }, 10000);
   }
   
   useEffect(() => {
-    
-    //  storeDetails();
     axios
       .get(
         'https://min-api.cryptocompare.com/data/pricemultifull?fsyms=BTC,ETH,USDT,XRP,BCH,BSV,LTC,BNB,EOS,ADA&tsyms=USD&api_key={362a965976ce99a80e7e7955dbb0353c2d9db8df0ecd2817c32052ea3453b07f}'
       )
       .then((res) => {
+
         let cryptos = res.data;
         let tempCoins = cryptos['DISPLAY'];
         setCoins(tempCoins);
-        
-        //setLoaded(false);
-      // storeDetails();
-       // colourChange();
-        test();
-       console.log(coins);
-        console.log("inside useEffect")
-        console.log("latest BTC price " + tempCoins['BTC'].USD.PRICE)
-        setPriceArr([])
-        Object.keys(tempCoins).map((key,id) => {
-    
+        colourChange(tempCoins);
+        if(loaded){
+          initValues(tempCoins);
           
-     
-          //  names.push(key);
-            
-           // oneHourChange.push(coins[key].USD.CHANGEPCTHOUR);
-           // twentyfourHourChange.push(coins[key].USD.CHANGEPCT24HOUR);
-          //  marketCap.push(coins[key].USD.MKTCAP);
-          
-          setPriceArr(priceArr => [...priceArr, tempCoins[key].USD.PRICE]);
-  //         setPriceArr(tempCoins[key].USD.PRICE);
-           console.log(priceArr[id])
-          });
+        }else{
+          updateValues(tempCoins);
+        }
 
-         
+        // force useEffect to run every 10 seconds
+        test();
+        console.log("latest BTC price " + tempCoins['BTC'].USD.PRICE)
+  
        
       });
       
-      
-      
-
   }, [tester]);
 
 
+  function initValues(tempCoins){
+    console.log("init values ran")
+    
+    Object.keys(tempCoins).map((key,id) => {
+      console.log(tempCoins[key].USD.CHANGEPCTHOUR)
+      setoneHRChange(oneHRChange => [...oneHRChange, tempCoins[key].USD.CHANGEPCTHOUR]);
+      setPriceArr(priceArr => [...priceArr, tempCoins[key].USD.PRICE]);
 
+    
+      });
+      setLoaded(false)
+  }
+
+  function updateValues(tempCoins){
+    setPriceArr([])
+    setoneHRChange([])
+    console.log(coins)
+    Object.keys(coins).map((key,id) => {
+      
+      setoneHRChange(oneHRChange => [...oneHRChange, tempCoins[key].USD.CHANGEPCTHOUR]);
+      settwentyFourHRChange(twentyFourHRChange => [...twentyFourHRChange, tempCoins[key].USD.CHANGEPCT24HOUR]);
+      setPriceArr(priceArr => [...priceArr, tempCoins[key].USD.PRICE]);
+
+      console.log(oneHRChange[id])
+      
+      });
+  }
  
 
-  function colourChange () {
-   
+  function colourChange (tempCoins) {
+    setTempArr([])
+    setTempArr2([])
      
     Object.keys(coins).map((key,id) => {
       
-      var check = Math.sign(coins[key].USD.CHANGEPCTHOUR);
-      var check2 = Math.sign(coins[key].USD.CHANGEPCT24HOUR);
+      var check = Math.sign(tempCoins[key].USD.CHANGEPCTHOUR);
+      var check2 = Math.sign(tempCoins[key].USD.CHANGEPCT24HOUR);
       console.log(coins[key].USD.CHANGEPCTHOUR);
       console.log(check);
 
@@ -157,6 +137,7 @@ const GetPrices = () => {
         <thead>
           <tr id='tableHead'>
             <th  scope='col'>Rank</th>
+            <th  scope='col'>Symbol</th>
             <th  scope='col'>Name</th>
             <th scope='col'>Price(USD)</th>
             <th scope='col'>1Hr Change</th>
@@ -171,7 +152,10 @@ const GetPrices = () => {
               <td id='rank' scope='row'>
                 {counter++}
               </td>
-
+              <td className="imageColumn">
+                <img  className="image" src="https://cryptocompare.com/media/19633/btc.png"></img>
+              </td>
+              
               <td id='name'>{key}</td>
               {
                 <td id='price'>
@@ -186,12 +170,12 @@ const GetPrices = () => {
                 </td>
               }
               <td id='1hrChange' style={{ color: tempArr[index] }}>
-                {coins[key].USD.CHANGEPCTHOUR}%
+                {oneHRChange[index]}%
                 
               </td>
 
               <td id='24hrChange' style={{ color: tempArr2[index] }}>
-                {coins[key].USD.CHANGEPCT24HOUR}%
+                {twentyFourHRChange[index]}%
               </td>
 
               <td id='24Volume'>{coins[key].USD.VOLUME24HOUR}</td>
