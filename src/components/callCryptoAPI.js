@@ -37,14 +37,15 @@ const GetPrices = () => {
         let cryptos = res.data;
         let tempCoins = cryptos['DISPLAY'];
         setCoins(tempCoins);
-        colourChange(tempCoins);
+        
         if(loaded){
+          
           initValues(tempCoins);
           
         }else{
-          updateValues(tempCoins);
+          updateValues(tempCoins)
         }
-
+        
         // force useEffect to run every 10 seconds
         test();
         console.log("latest BTC price " + tempCoins['BTC'].USD.PRICE)
@@ -56,31 +57,38 @@ const GetPrices = () => {
 
 
   function initValues(tempCoins){
+
     console.log("init values ran")
     
     Object.keys(tempCoins).map((key,id) => {
       console.log(tempCoins[key].USD.CHANGEPCTHOUR)
       setoneHRChange(oneHRChange => [...oneHRChange, tempCoins[key].USD.CHANGEPCTHOUR]);
+      settwentyFourHRChange(twentyFourHRChange => [...twentyFourHRChange, tempCoins[key].USD.CHANGEPCT24HOUR]);
       setPriceArr(priceArr => [...priceArr, tempCoins[key].USD.PRICE]);
 
     
       });
       setLoaded(false)
+      colourChange(tempCoins)
   }
 
   function updateValues(tempCoins){
-    setPriceArr([])
+
+    console.log("update values ran")
+    // reset state array to empty after every call
+    //setPriceArr([])
     setoneHRChange([])
-    console.log(coins)
+    settwentyFourHRChange([])
+    
     Object.keys(coins).map((key,id) => {
       
       setoneHRChange(oneHRChange => [...oneHRChange, tempCoins[key].USD.CHANGEPCTHOUR]);
       settwentyFourHRChange(twentyFourHRChange => [...twentyFourHRChange, tempCoins[key].USD.CHANGEPCT24HOUR]);
-      setPriceArr(priceArr => [...priceArr, tempCoins[key].USD.PRICE]);
-
-      console.log(oneHRChange[id])
+      setPriceArr(setPriceArr => [...setPriceArr, tempCoins[key].USD.PRICE]);
       
+
       });
+      colourChange(tempCoins)
   }
  
 
@@ -92,7 +100,9 @@ const GetPrices = () => {
       
       var check = Math.sign(tempCoins[key].USD.CHANGEPCTHOUR);
       var check2 = Math.sign(tempCoins[key].USD.CHANGEPCT24HOUR);
-      console.log(coins[key].USD.CHANGEPCTHOUR);
+      
+      //console.log(tempCoins[key].USD.CHANGEPCTHOUR);
+      console.log(tempCoins[key].USD.CHANGEPCT24HOUR);
       console.log(check);
 
       if (check === -1) {
@@ -156,7 +166,7 @@ const GetPrices = () => {
                 <img  className="image" src="https://cryptocompare.com/media/19633/btc.png"></img>
               </td>
               
-              <td id='name'>{key}</td>
+          <td id='name'>{key}<br></br>{}</td>
               {
                 <td id='price'>
                   <NumberFormat
